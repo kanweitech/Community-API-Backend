@@ -30,12 +30,14 @@ const getDashboardData = async () => {
     const prevActiveSince = new Date(now);
     prevActiveSince.setDate(now.getDate() - 14);
 
-    const activeMembersCount = await User.count({
-        where: { lastActiveAt: { [Op.gte]: activeSince } },
-    });
-    const prevActiveMembersCount = await User.count({
-        where: { lastActiveAt: { [Op.between]: [prevActiveSince, activeSince] } },
-    });
+    const [
+        activeMembersCount,
+        prevActiveMembersCount,
+    ] = await Promise.all([
+        User.count({ where: { lastActiveAt: { [Op.gte]: activeSince } } }),
+        User.count({ where: { lastActiveAt: { [Op.between]: [prevActiveSince, activeSince] } } }),
+    ]);
+    
 
     // Active Projects (last 30 days)
     const activeProjectSince = new Date(now);
@@ -44,12 +46,15 @@ const getDashboardData = async () => {
     const prevActiveProjectSince = new Date(now);
     prevActiveProjectSince.setDate(now.getDate() - 60);
 
-    const activeProjectsCount = await Project.count({
-        where: { lastUpdated: { [Op.gte]: activeProjectSince  } },
-    });
-    const prevActiveProjectsCount = await Project.count({
-        where: { lastUpdated: { [Op.between]: [prevActiveProjectSince, activeProjectSince] } },
-    });
+    const [
+        activeProjectsCount,
+        prevActiveProjectsCount,
+    ] = await Promise.all([
+        Project.count({ where: { lastUpdated: { [Op.gte]: activeProjectSince } } }),
+        Project.count({ where: { lastUpdated: { [Op.between]: [prevActiveProjectSince, activeProjectSince] } } }),
+    ]);
+
+    
 
     // Upcoming Events (next 14 days)
     // const upcomingSince = new Date(now);
@@ -81,12 +86,15 @@ const getDashboardData = async () => {
     const prevMonthStart = new Date(now.getFullYear(), now.getMonth() - 1, 1);
     const prevMonthEnd = new Date(now.getFullYear(), now.getMonth(), 0);
 
-    const blogPostsCount = await Blog.count({ where: { status: 'published' } });
-    const prevBlogPostsCount = await Blog.count({ 
-        where: { 
-            status: 'published', createdAt: { [Op.between]: [prevMonthStart, prevMonthEnd] },
-        },
-    });
+    const [
+        blogPostsCount,
+        prevBlogPostsCount,
+    ] = await Promise.all([
+        Blog.count({ where: { status: 'published' } }),
+        Blog.count({ where: { status: 'published', createdAt: { [Op.between]: [prevMonthStart, prevMonthEnd] } } }),
+    ]);
+
+    
 
     const metrics = {
         activeMembers: {

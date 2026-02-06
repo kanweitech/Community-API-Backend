@@ -33,6 +33,9 @@ app.set('trust proxy', 1); // good practice if you’ll use Secure cookies behin
 app.use(cookieParser());
 app.use(passport.initialize());
 
+// Disable ETag headers
+app.set('etag', false);
+
 // Serve Swagger UI
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
